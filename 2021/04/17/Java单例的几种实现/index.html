@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html lang="en" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Java单例的几种实现 - wangkelei</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="在日常开发中经常使用到的模式就是单例模式，单例模式要求...">
+  <meta name="author" content="John Doe">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_r673sha78lq.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/rainbow.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/solarized-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: false,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: false
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '',
+          api: ''
+        },
+        motto: {
+          default: '我在开了灯的床头下，想问问自己的心啊。',
+          typing: true,
+          api: 'https://v2.jinrishici.com/one.json',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: false,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'default'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      },
+      search: {
+        enable: false,
+        path: 'search.xml'
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+    
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconhome j-navbar-back-home"></i>
+      
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+      
+    </div>
+    <div class="center">Java单例的几种实现</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+  </nav>
+
+  
+  
+
+<nav class="menu">
+  <div class="menu-container">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://wangkelei.gitee.io/">Wang</a></p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="https://images.unsplash.com/photo-1616868560403-b4675d3a545b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=600&q=80" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Java单例的几种实现</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>April 17, 2021</span>
+      
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>1782</span>
+    </div>
+  </div>
+</section>
+    <section class="main">
+      <section class="content">
+        <p>在日常开发中经常使用到的模式就是单例模式，单例模式要求只能创建一个对象实例，通常的写法就是私有化构造函数，提供静态方法获取单例对象实例.常见的写法有饿汉式、懒汉式、双重校验锁(DCL)、内部静态类。下边按类别说明下如何实现.</p>
+<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><p>饿汉式是最好理解的，通常是定义一个静态的成员变量并初始化。该写法的优点是可以不加锁就获取实例对象，线程安全。缺点是不是懒加载，存在内存浪费。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><p>既然饿汉式存在内存浪费的问题，那就需要一种解决问题的写法。饿汉式就是解决该问题的写法，这种写法可以在使用到实例的时候才执行初始化，从而避免内存浪费的问题。该写法通过同步锁方式加锁获取实例对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton INSTANCE;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>)<br>            INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="双重校验锁-DCL"><a href="#双重校验锁-DCL" class="headerlink" title="双重校验锁(DCL)"></a>双重校验锁(DCL)</h2><p>该写法解决了懒汉式写法的性能问题。先判断是否为null，如果为null再执行加锁，然后再判断一次。这样的话只有实例对象为null的情况下才会去加锁创建对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton INSTANCE;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>)<br>                    INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="内部静态类"><a href="#内部静态类" class="headerlink" title="内部静态类"></a>内部静态类</h2><p>通过JVM来保证创建单例对象的线程安全和唯一性，推荐这种写法。<code>Singleton</code>类加载的时候，<code>SingletonHolder</code>不会加载，只有在调用<code>getInstance</code>方法的时候才会执行初始化，这样既起到了懒加载的作用，同时又使用到了JVM类加载机制，保证了单例对象初始化的线程安全。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SingletonHolder</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Singleton INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+      </section>
+      <section class="extra">
+        
+        
+        
+  <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li></ul> 
+
+        
+  <nav class="nav">
+    <a></a>
+    <a href="/2020/10/16/hello-world/">Hello World<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A5%BF%E6%B1%89%E5%BC%8F"><span class="toc-text">饿汉式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-text">懒汉式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A0%A1%E9%AA%8C%E9%94%81-DCL"><span class="toc-text">双重校验锁(DCL)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E9%9D%99%E6%80%81%E7%B1%BB"><span class="toc-text">内部静态类</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="tencent://message/?Menu=yes&uin=178596292 "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#12B7F5'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  iconQQ "></i>
+      </a><a 
+        href="https://github.com/wangkelei "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a><a 
+        href="mailto:178596292@qq.com "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color=#FF3B00" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  iconmail"></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>Powered by <a target="_blank" href="https://hexo.io">Hexo</a>  |  Theme - <a target="_blank" href="https://wangkelei.gitee.io/">Wang</a></p></div>
+  
+</footer>
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

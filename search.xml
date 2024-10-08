@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Java单例的几种实现</title>
+    <url>/2021/04/17/Java%E5%8D%95%E4%BE%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E5%AE%9E%E7%8E%B0/</url>
+    <content><![CDATA[<p>在日常开发中经常使用到的模式就是单例模式，单例模式要求只能创建一个对象实例，通常的写法就是私有化构造函数，提供静态方法获取单例对象实例.常见的写法有饿汉式、懒汉式、双重校验锁(DCL)、内部静态类。下边按类别说明下如何实现.</p>
+<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><p>饿汉式是最好理解的，通常是定义一个静态的成员变量并初始化。该写法的优点是可以不加锁就获取实例对象，线程安全。缺点是不是懒加载，存在内存浪费。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><p>既然饿汉式存在内存浪费的问题，那就需要一种解决问题的写法。饿汉式就是解决该问题的写法，这种写法可以在使用到实例的时候才执行初始化，从而避免内存浪费的问题。该写法通过同步锁方式加锁获取实例对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton INSTANCE;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>)<br>            INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="双重校验锁-DCL"><a href="#双重校验锁-DCL" class="headerlink" title="双重校验锁(DCL)"></a>双重校验锁(DCL)</h2><p>该写法解决了懒汉式写法的性能问题。先判断是否为null，如果为null再执行加锁，然后再判断一次。这样的话只有实例对象为null的情况下才会去加锁创建对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton INSTANCE;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (INSTANCE == <span class="hljs-keyword">null</span>)<br>                    INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="内部静态类"><a href="#内部静态类" class="headerlink" title="内部静态类"></a>内部静态类</h2><p>通过JVM来保证创建单例对象的线程安全和唯一性，推荐这种写法。<code>Singleton</code>类加载的时候，<code>SingletonHolder</code>不会加载，只有在调用<code>getInstance</code>方法的时候才会执行初始化，这样既起到了懒加载的作用，同时又使用到了JVM类加载机制，保证了单例对象初始化的线程安全。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SingletonHolder</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Singleton INSTANCE = <span class="hljs-keyword">new</span> Singleton();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> SingletonHolder.INSTANCE;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/10/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+</search>
